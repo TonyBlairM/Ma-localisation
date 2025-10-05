@@ -1,55 +1,79 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Partage de position</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Localisation automatique vers Google Form</title>
+
+  <!-- Style simple et clair -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #00b4db, #0083b0);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      background-color: #ffcc00;
+      color: #000;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #ffd633;
+      transform: scale(1.05);
+    }
+    footer {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
 </head>
+
 <body>
-  <h2>📍 Partager ma position avec le formulaire</h2>
-  <p>Cliquez sur le bouton ci-dessous pour ouvrir automatiquement le formulaire avec votre position :</p>
-  <button onclick="getLocation()">Obtenir ma position et ouvrir le formulaire</button>
-  <p id="status"></p>
+  <h1>🔍 Envoyer votre position GPS à Google Form</h1>
+  <p>Cliquez sur le bouton ci-dessous pour partager votre position et ouvrir le formulaire.</p>
+
+  <button id="getLocation">📍 Envoyer ma position</button>
+
+  <footer>Développé par Denis Blanc | © 2025</footer>
 
   <script>
-    // Ton lien de formulaire prérempli
-    const baseFormURL = "https://docs.google.com/forms/d/e/1_j2LzPVC8y9zI32FXKKj453P98W9GxXdSOEEAtwCPZo/viewform?usp=pp_url&entry.941934899=";
-
-    function getLocation() {
+    document.getElementById("getLocation").addEventListener("click", function() {
       if (navigator.geolocation) {
-        document.getElementById("status").innerText = "⏳ Récupération de la position...";
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.getCurrentPosition(function(position) {
+          let latitude = position.coords.latitude;
+          let longitude = position.coords.longitude;
+
+          // Ton lien Google Form avec le champ de localisation
+          let formURL = `https://docs.google.com/forms/d/e/1_j2LzPVC8y9zI32FXKKj453P98W9GxXdSOEEAtwCPZo/viewform?usp=pp_url&entry.941934899=https://www.google.com/maps?q=${latitude},${longitude}`;
+
+          // Ouvre le formulaire Google avec la position préremplie
+          window.open(formURL, "_blank");
+        }, function(error) {
+          alert("Impossible d'obtenir votre position. Vérifiez que la géolocalisation est activée.");
+        });
       } else {
-        document.getElementById("status").innerText = "❌ La géolocalisation n'est pas supportée.";
+        alert("La géolocalisation n'est pas supportée par votre navigateur.");
       }
-    }
-
-    function showPosition(position) {
-      let lat = position.coords.latitude;
-      let lon = position.coords.longitude;
-      let mapsLink = "https://www.google.com/maps?q=" + lat + "," + lon;
-
-      // Construire le lien final avec la position
-      let finalURL = baseFormURL + encodeURIComponent(mapsLink);
-
-      document.getElementById("status").innerText = "✅ Position détectée, ouverture du formulaire...";
-      window.open(finalURL, "_blank");
-    }
-
-    function showError(error) {
-      switch(error.code) {
-        case error.PERMISSION_DENIED:
-          document.getElementById("status").innerText = "❌ Autorisation refusée.";
-          break;
-        case error.POSITION_UNAVAILABLE:
-          document.getElementById("status").innerText = "❌ Position indisponible.";
-          break;
-        case error.TIMEOUT:
-          document.getElementById("status").innerText = "❌ Temps dépassé.";
-          break;
-        default:
-          document.getElementById("status").innerText = "❌ Erreur inconnue.";
-      }
-    }
+    });
   </script>
 </body>
 </html>
