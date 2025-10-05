@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Partage de position</title>
+</head>
+<body>
+  <h2>📍 Partager ma position avec le formulaire</h2>
+  <p>Cliquez sur le bouton ci-dessous pour ouvrir automatiquement le formulaire avec votre position :</p>
+  <button onclick="getLocation()">Obtenir ma position et ouvrir le formulaire</button>
+  <p id="status"></p>
+
+  <script>
+    // Ton lien de formulaire prérempli
+    const baseFormURL = "https://docs.google.com/forms/d/e/1_j2LzPVC8y9zI32FXKKj453P98W9GxXdSOEEAtwCPZo/viewform?usp=pp_url&entry.941934899=";
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        document.getElementById("status").innerText = "⏳ Récupération de la position...";
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        document.getElementById("status").innerText = "❌ La géolocalisation n'est pas supportée.";
+      }
+    }
+
+    function showPosition(position) {
+      let lat = position.coords.latitude;
+      let lon = position.coords.longitude;
+      let mapsLink = "https://www.google.com/maps?q=" + lat + "," + lon;
+
+      // Construire le lien final avec la position
+      let finalURL = baseFormURL + encodeURIComponent(mapsLink);
+
+      document.getElementById("status").innerText = "✅ Position détectée, ouverture du formulaire...";
+      window.open(finalURL, "_blank");
+    }
+
+    function showError(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          document.getElementById("status").innerText = "❌ Autorisation refusée.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          document.getElementById("status").innerText = "❌ Position indisponible.";
+          break;
+        case error.TIMEOUT:
+          document.getElementById("status").innerText = "❌ Temps dépassé.";
+          break;
+        default:
+          document.getElementById("status").innerText = "❌ Erreur inconnue.";
+      }
+    }
+  </script>
+</body>
+</html>
